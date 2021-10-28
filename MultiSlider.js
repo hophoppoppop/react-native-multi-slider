@@ -491,6 +491,7 @@ export default class MultiSlider extends React.Component {
     const {
       selectedStyle,
       unselectedStyle,
+      firstTrackStyle,
       sliderLength,
       markerOffsetX,
       markerOffsetY,
@@ -499,7 +500,7 @@ export default class MultiSlider extends React.Component {
 
     const trackOneLength = positionOne;
     const trackOneStyle = twoMarkers
-      ? unselectedStyle
+      ? firstTrackStyle?firstTrackStyle:unselectedStyle
       : selectedStyle || styles.selectedTrack;
     const trackThreeLength = twoMarkers ? sliderLength - positionTwo : 0;
     const trackThreeStyle = unselectedStyle;
