@@ -95,6 +95,7 @@ export interface MultiSliderProps {
     imageBackgroundSource?: string;
     enableLabel?: boolean;
     vertical?: boolean;
+    markerSize?: number;
 }
 
 export default class MultiSlider extends React.Component<MultiSliderProps> {}
