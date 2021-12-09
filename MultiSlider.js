@@ -552,7 +552,7 @@ export default class MultiSlider extends React.Component {
       <React.Fragment>
         <View style={[styles.fullTrack, { width: sliderLength }]}>
           <View
-            testID={testIDFinish}
+            testID={this.props.testIDFinish}
             style={[
               styles.track,
               this.props.trackStyle,
@@ -581,7 +581,7 @@ export default class MultiSlider extends React.Component {
           )}
           {this.props.showSteps && this.getSteps()}
           <View
-            testID={testIDValues}
+            testID={this.props.testIDValues}
             style={[
               styles.markerContainer,
               markerContainerOne,
