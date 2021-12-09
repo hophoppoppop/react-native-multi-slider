@@ -96,6 +96,9 @@ export interface MultiSliderProps {
     enableLabel?: boolean;
     vertical?: boolean;
     markerSize?: number;
+    testID?: string;
+    testIDFinish?: string;
+    testIDValues?: string;
 }
 
 export default class MultiSlider extends React.Component<MultiSliderProps> {}
