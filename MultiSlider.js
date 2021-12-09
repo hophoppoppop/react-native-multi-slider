@@ -54,6 +54,8 @@ export default class MultiSlider extends React.Component {
     minMarkerOverlapDistance: 0,
     minMarkerOverlapStepDistance: 0,
     testID: '',
+    testIDFinish: '',
+    testIDValues: '',
   };
 
   constructor(props) {
@@ -550,6 +552,7 @@ export default class MultiSlider extends React.Component {
       <React.Fragment>
         <View style={[styles.fullTrack, { width: sliderLength }]}>
           <View
+            testID={testIDFinish}
             style={[
               styles.track,
               this.props.trackStyle,
@@ -578,6 +581,7 @@ export default class MultiSlider extends React.Component {
           )}
           {this.props.showSteps && this.getSteps()}
           <View
+            testID={testIDValues}
             style={[
               styles.markerContainer,
               markerContainerOne,
