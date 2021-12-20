@@ -199,17 +199,20 @@ export default class MultiSlider extends React.Component {
       ? this.state.pastOne - accumDistance
       : accumDistance + this.state.pastOne;
     var bottom = this.props.markerSize / 2;
-    var trueTop =
-      this.state.positionTwo -
-      (this.props.allowOverlap
+    // var trueTop =
+    //   this.state.positionTwo -
+    //   (this.props.allowOverlap
+    //     ? 0
+    //     : this.props.minMarkerOverlapDistance > 0
+    //     ? this.props.minMarkerOverlapDistance
+    //     : (this.props.minMarkerOverlapStepDistance || 1) * this.stepLength);
+    // var top =
+    //   trueTop === 0
+    //     ? 0
+    //     : trueTop || this.props.sliderLength - this.props.markerSize / 2;
+    var top = this.props.sliderLength - this.props.markerSize / 2 - (this.props.allowOverlap
         ? 0
-        : this.props.minMarkerOverlapDistance > 0
-        ? this.props.minMarkerOverlapDistance
-        : (this.props.minMarkerOverlapStepDistance || 1) * this.stepLength);
-    var top =
-      trueTop === 0
-        ? 0
-        : trueTop || this.props.sliderLength - this.props.markerSize / 2;
+        : this.props.minMarkerOverlapDistance);
     var confined =
       unconfined < bottom ? bottom : unconfined > top ? top : unconfined;
     var slipDisplacement = this.props.touchDimensions.slipDisplacement;
@@ -233,25 +236,56 @@ export default class MultiSlider extends React.Component {
       this.setState({
         positionOne: this.props.snapped ? snapped : confined,
       });
-
       if (value !== this.state.valueOne) {
-        this.setState(
+        const setValueOne = ()=>{
+          this.setState(
+            {
+              valueOne: value,
+            },
+            () => {
+              var change = [this.state.valueOne];
+              if (this.state.valueTwo) {
+                change.push(this.state.valueTwo);
+              }
+              this.props.onValuesChange(change);
+  
+              this.props.onMarkersPosition([
+                this.state.positionOne,
+                this.state.positionTwo,
+              ]);
+            },
+          );
+        };
+        if(this.state.valueTwo && this.props.minMarkerOverlapDistance)
+        {
+          var topTwo = this.props.sliderLength - this.props.markerSize / 2;
+          var unconfinedTwo = confined + this.props.minMarkerOverlapDistance;
+          var confinedTwo = unconfinedTwo > topTwo? topTwo: unconfinedTwo;
+          var valueTwo = positionToValue(
+            confinedTwo,
+            this.optionsArray,
+            this.props.sliderLength,
+            this.props.markerSize,
+          );
+          var snappedTwo = valueToPosition(
+            valueTwo,
+            this.optionsArray,
+            this.props.sliderLength,
+            this.props.markerSize,
+          );
+          var positionTwo = this.props.snapped ? snappedTwo : confinedTwo;
+          if(positionTwo > this.state.positionTwo)
           {
-            valueOne: value,
-          },
-          () => {
-            var change = [this.state.valueOne];
-            if (this.state.valueTwo) {
-              change.push(this.state.valueTwo);
-            }
-            this.props.onValuesChange(change);
-
-            this.props.onMarkersPosition([
-              this.state.positionOne,
-              this.state.positionTwo,
-            ]);
-          },
-        );
+            this.setState({
+              positionTwo: positionTwo,
+              valueTwo: valueTwo
+            },setValueOne)
+          }else{
+            setValueOne();
+          }
+        }else{
+          setValueOne();
+        }
       }
     }
   };
@@ -271,13 +305,19 @@ export default class MultiSlider extends React.Component {
     const unconfined = I18nManager.isRTL
       ? this.state.pastTwo - accumDistance
       : accumDistance + this.state.pastTwo;
+
+    // var bottom =
+    //   this.state.positionOne +
+    //   (this.props.allowOverlap
+    //     ? 0
+    //     : this.props.minMarkerOverlapDistance > 0
+    //     ? this.props.minMarkerOverlapDistance
+    //     : (this.props.minMarkerOverlapStepDistance || 1) * this.stepLength);
     var bottom =
-      this.state.positionOne +
+    this.props.markerSize / 2 +
       (this.props.allowOverlap
         ? 0
-        : this.props.minMarkerOverlapDistance > 0
-        ? this.props.minMarkerOverlapDistance
-        : (this.props.minMarkerOverlapStepDistance || 1) * this.stepLength);
+        : this.props.minMarkerOverlapDistance);
     var top = this.props.sliderLength - this.props.markerSize / 2;
     var confined =
       unconfined < bottom ? bottom : unconfined > top ? top : unconfined;
@@ -305,22 +345,54 @@ export default class MultiSlider extends React.Component {
       });
 
       if (value !== this.state.valueTwo) {
-        this.setState(
+        const setValueTwo = ()=>{
+          this.setState(
+            {
+              valueTwo: value,
+            },
+            () => {
+              this.props.onValuesChange([
+                this.state.valueOne,
+                this.state.valueTwo,
+              ]);
+  
+              this.props.onMarkersPosition([
+                this.state.positionOne,
+                this.state.positionTwo,
+              ]);
+            },
+          );
+        };
+        if(this.props.minMarkerOverlapDistance)
+        {
+          var bottomOne = this.props.markerSize / 2;
+          var unconfinedOne = confined - this.props.minMarkerOverlapDistance;
+          var confinedOne = unconfinedOne < bottomOne? bottomOne: unconfinedOne;
+          var valueOne = positionToValue(
+            confinedOne,
+            this.optionsArray,
+            this.props.sliderLength,
+            this.props.markerSize,
+          );
+          var snappedOne = valueToPosition(
+            valueOne,
+            this.optionsArray,
+            this.props.sliderLength,
+            this.props.markerSize,
+          );
+          var positionOne = this.props.snapped ? snappedOne : confinedOne;
+          if(positionOne < this.state.positionOne)
           {
-            valueTwo: value,
-          },
-          () => {
-            this.props.onValuesChange([
-              this.state.valueOne,
-              this.state.valueTwo,
-            ]);
-
-            this.props.onMarkersPosition([
-              this.state.positionOne,
-              this.state.positionTwo,
-            ]);
-          },
-        );
+            this.setState({
+              positionOne: positionOne,
+              valueOne: valueOne
+            },setValueTwo)
+          }else{
+            setValueTwo();
+          }
+        }else{
+          setValueTwo();
+        }
       }
     }
   };
@@ -340,6 +412,7 @@ export default class MultiSlider extends React.Component {
     this.setState(
       {
         pastOne: this.props.smoothSnapped ? snapped : this.state.positionOne,
+        pastTwo: this.state.positionTwo,
         ...(this.props.smoothSnapped ? { positionOne: snapped } : {}),
         onePressed: !this.state.onePressed,
       },
@@ -369,6 +442,7 @@ export default class MultiSlider extends React.Component {
       {
         twoPressed: !this.state.twoPressed,
         pastTwo: this.props.smoothSnapped ? snapped : this.state.positionTwo,
+        pastOne: this.state.positionOne,
         ...(this.props.smoothSnapped ? { positionTwo: snapped } : {}),
       },
       () => {
